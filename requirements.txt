@@ -1,0 +1,17 @@
+# LangChain Core and Expression Language (LCEL)
+langchain-core
+langchain
+
+# Ecosystem & Integrations
+langchain-community
+langchain-mistralai
+langchain-tavily
+
+# Tools & Scraping
+tavily-python
+beautifulsoup4
+requests
+lxml
+
+# Environment Management
+python-dotenv
