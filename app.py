@@ -2,7 +2,7 @@ import streamlit as st
 import time
 from dotenv import load_dotenv
 import os
-from agent import build_search_agent, build_scraping_agent, writer_chain, critic_chain
+from agent import build_search_agent, build_scraping_agent, build_writer_chain, build_critic_chain
 from pipeline import get_tool_output
 
 # Set page configuration first
@@ -166,7 +166,7 @@ def run_pipeline_stream(topic: str):
         f"SEARCH RESULTS : \n {state['search_result']} \n\n"
         f"DETAILED SCRAPED CONTENT : \n {state['scraped_content']}"
     )
-    state["report"] = writer_chain.invoke({
+    state["report"] = build_writer_chain().invoke({
         "topic" : topic,
         "research" : research_combined
     })
@@ -175,7 +175,7 @@ def run_pipeline_stream(topic: str):
     
     # Step 4: Critic Chain
     yield 4, "Reviewing draft and scoring...", state
-    state["feedback"] = critic_chain.invoke({
+    state["feedback"] = build_critic_chain().invoke({
         "report": state['report']
     })
     

@@ -5,13 +5,14 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from tools import web_search, scrape_url
 
-llm = ChatMistralAI(model="mistral-small-2603", temperature=0, max_retries=10)
+def get_llm():
+    return ChatMistralAI(model="mistral-small-2603", temperature=0, max_retries=10)
 
 def build_search_agent():
-    return create_agent(model = llm, tools = [web_search])
+    return create_agent(model = get_llm(), tools = [web_search])
 
 def build_scraping_agent():
-    return create_agent(model = llm, tools = [scrape_url])
+    return create_agent(model = get_llm(), tools = [scrape_url])
 
 writer_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are an expert research writer. Write clear, structured and insightful reports."),
@@ -31,7 +32,8 @@ writer_prompt = ChatPromptTemplate.from_messages([
     Be detailed, factual and professional."""),
     ])
 
-writer_chain = writer_prompt | llm | StrOutputParser()
+def build_writer_chain():
+    return writer_prompt | get_llm() | StrOutputParser()
 
 critic_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a sharp and constructive research critic. Be honest and specific."),
@@ -56,4 +58,12 @@ critic_prompt = ChatPromptTemplate.from_messages([
     ..."""),
     ])
 
-critic_chain = critic_prompt | llm | StrOutputParser()
+def build_critic_chain():
+    return critic_prompt | get_llm() | StrOutputParser()
+
+def __getattr__(name: str):
+    if name == "writer_chain":
+        return build_writer_chain()
+    if name == "critic_chain":
+        return build_critic_chain()
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")

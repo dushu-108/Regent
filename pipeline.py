@@ -1,4 +1,4 @@
-from agent import build_search_agent, build_scraping_agent, writer_chain, critic_chain
+from agent import build_search_agent, build_scraping_agent, build_writer_chain, build_critic_chain
 import time
 
 def get_tool_output(messages, tool_name: str) -> str:
@@ -48,7 +48,7 @@ def run_research_pipeline(topic : str) -> dict:
         f"DETAILED SCRAPED CONTENT : \n {state['scraped_content']}"
     )
 
-    state["report"] = writer_chain.invoke({
+    state["report"] = build_writer_chain().invoke({
         "topic" : topic,
         "research" : research_combined
     })
@@ -60,7 +60,7 @@ def run_research_pipeline(topic : str) -> dict:
     print("Step 4 - Critic is reviewing the report ")
     print("="*50)
 
-    state["feedback"] = critic_chain.invoke({
+    state["feedback"] = build_critic_chain().invoke({
         "report":state['report']
     })
 
