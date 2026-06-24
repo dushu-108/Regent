@@ -1,7 +1,25 @@
 from agent import build_search_agent, build_scraping_agent, writer_chain, critic_chain
 import time
 
+def format_message_content(content) -> str:
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, dict):
+                if block.get("type") == "text":
+                    parts.append(block.get("text", ""))
+                elif block.get("type") == "reference":
+                    ref_ids = block.get("reference_ids", [])
+                    if ref_ids:
+                        ref_str = ",".join(map(str, ref_ids))
+                        parts.append(f"[{ref_str}]")
+            else:
+                parts.append(str(block))
+        return "".join(parts).strip()
+    return str(content)
+
 def run_research_pipeline(topic : str) -> dict:
+
 
     state = {}
 
@@ -14,7 +32,7 @@ def run_research_pipeline(topic : str) -> dict:
         {"messages" : [{"role" : "user", "content" : f"Search the web for information on {topic}"}]}
     )
 
-    state["search_result"] = search_result["messages"][-1].content
+    state["search_result"] = format_message_content(search_result["messages"][-1].content)
     print("Search Results :", state["search_result"])
 
     time.sleep(5)
@@ -30,7 +48,7 @@ def run_research_pipeline(topic : str) -> dict:
             f"Search Results:\n{state['search_result'][:800]}"}]}
     )
 
-    state['scraped_content'] = scraping_result['messages'][-1].content
+    state['scraped_content'] = format_message_content(scraping_result['messages'][-1].content)
     print("\nscraped content: \n", state['scraped_content'])
 
     time.sleep(5)
