@@ -4,13 +4,11 @@ from langchain_tavily import TavilySearch
 from langchain.tools import tool
 from bs4 import BeautifulSoup 
 import requests
-from rich import print
-
-search = TavilySearch(max_results=5)
 
 @tool
 def web_search(query:str) -> str:
     """Search the web for recent and reliable information on a topic. Return's titles, urls and snippets"""
+    search = TavilySearch(max_results=5)
     responses = search.invoke({"query": query})
     out = []
     for r in responses['results']:
